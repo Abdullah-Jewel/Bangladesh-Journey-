@@ -5,7 +5,7 @@
 <title>Bangladesh Visited Map – 64 Districts · Made by Abdullah Mukter</title>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light;--bg:#f6f5f0;--panel:#fffefb;--ink:#17231f;--mute:#5d6b65;--line:#d9d8cf;--ac:#00775a;--red:#d8243a;--halo:#fffefb;--sea:#e7eef0;--vis:#00775a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{color-scheme:light;--bg:#f6f5f0;--panel:#fffefb;--ink:#17231f;--mute:#5d6b65;--line:#d9d8cf;--ac:#00775a;--red:#d8243a;--halo:#fffefb;--sea:#e7eef0;--vis:#00775a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + var(--ad-h,0px))}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#101a17;--panel:#16231f;--ink:#e8efeb;--mute:#a3b4ac;--line:#2d3f38;--halo:#0f1815;--sea:#0b1311;--ac:#38c9a0;--vis:#16a37c;--red:#ff5a6e}}
 :root[data-theme=dark]{color-scheme:dark;--bg:#101a17;--panel:#16231f;--ink:#e8efeb;--mute:#a3b4ac;--line:#2d3f38;--halo:#0f1815;--sea:#0b1311;--ac:#38c9a0;--vis:#16a37c;--red:#ff5a6e}
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%;-webkit-text-size-adjust:100%}
@@ -47,7 +47,7 @@ input[type=search]{width:100%;-webkit-appearance:none;appearance:none}
 .li{display:flex;align-items:center;gap:9px;padding:6px 2px;cursor:pointer;border-radius:6px}.li input{accent-color:var(--vis);width:18px;height:18px;margin:0}.li small{color:var(--mute);margin-left:auto}
 @media(hover:hover){.li:hover{background:var(--bg)}button:hover{border-color:var(--ac)}}
 .note{font-size:13px;color:var(--mute)}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast{position:fixed;left:50%;bottom:calc(24px + var(--ad-h,0px) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
 @media(max-width:820px){html,body{height:auto}.app{display:block;height:auto}.mapwrap{height:62vh;height:62svh}aside{border-left:0;border-top:1px solid var(--line);overflow:visible;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}.tools .mob{display:block}select,input[type=search]{font-size:16px}.dv{grid-template-columns:86px 1fr 38px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style></head><body>
@@ -155,9 +155,35 @@ try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
 $('msg').textContent='Your marks are saved in this browser. The share link carries them, so friends can open your map.';
 DATA.d.forEach(paint);stats();info();buildList();toast('All districts cleared')};
 function toast(t){const e=$('toast');e.textContent=t;e.style.opacity=1;setTimeout(()=>e.style.opacity=0,1800)}
-$('share').onclick=async()=>{const l=location.href.split('#')[0]+'#v='+hex();try{await navigator.clipboard.writeText(l);toast('Link copied')}catch(e){prompt('Copy this link',l)}};
+$('share').onclick=async()=>{const WEB='https://abdullah-jewel.github.io/Bangladesh-Journey-/';const base=/^https?:$/.test(location.protocol)&&location.hostname!=='localhost'?location.href.split('#')[0]:WEB;const l=base+'#v='+hex();
+try{if(window.Capacitor&&navigator.share){await navigator.share({title:'My Bangladesh Visited Map',url:l});return}await navigator.clipboard.writeText(l);toast('Link copied')}catch(e){if(e&&e.name==='AbortError')return;try{await navigator.clipboard.writeText(l);toast('Link copied')}catch(e2){$('msg').textContent='Copy this link: '+l}}};
 const m=location.hash.match(/v=([0-9a-f]+)/i);
 if(m){load(m[1]);$('msg').textContent='Showing a shared map. Any change you make is saved to your own browser.'}
 else try{const s=localStorage.getItem('bdv');if(s)load(s)}catch(e){}
 DATA.d.forEach(paint);setText();stats();info();buildList();layout(false);
-</script></body></html>
+</script>
+<script>
+/* ===== AdMob banner (Android app only; the website shows no ads) =====
+   Replace BOTH test ids below with your real AdMob ids before publishing:
+   - BANNER_ID: your AdMob *ad unit* id  (ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN)
+   - the app id goes in android/app/src/main/res/values/strings.xml (admob_app_id) */
+(function(){
+const BANNER_ID='ca-app-pub-3625777238667964/5313752372'; // Google TEST banner id
+const C=window.Capacitor; if(!C||!C.isNativePlatform||!C.isNativePlatform())return;
+const A=(C.Plugins&&C.Plugins.AdMob)||(C.registerPlugin&&C.registerPlugin('AdMob')); if(!A)return;
+const setH=h=>document.documentElement.style.setProperty('--ad-h',(h||0)+'px');
+async function start(){
+ try{
+  let ci=await A.requestConsentInfo();
+  if(ci.isConsentFormAvailable&&ci.status==='REQUIRED')ci=await A.showConsentForm();
+  if(!ci.canRequestAds)return;
+  await A.initialize();
+  A.addListener('bannerAdSizeChanged',i=>setH(i&&i.height));
+  A.addListener('bannerAdFailedToLoad',()=>setH(0));
+  await A.showBanner({adId:BANNER_ID,adSize:'ADAPTIVE_BANNER',position:'BOTTOM_CENTER',margin:0});
+ }catch(e){setH(0)}
+}
+if(document.readyState==='complete')start();else addEventListener('load',start);
+})();
+</script>
+</body></html>
